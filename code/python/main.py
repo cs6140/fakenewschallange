@@ -6,13 +6,18 @@ import featureengineering as fe
 
 
 ## read the  joined csv file
-filename = "<to-be-added>"
+filename = "../../data/train.csv"
 data = pd.read_csv(filename, sep=',')
 
 
-## remove stopwords from the article body
-data['content'] = data.articleBody.apply(lambda x : fe.tokenize(x))
-data['content'] = data.content.apply(lambda x : fe.remove_stopwords(x))
+## generate necessary token features for dnews heading and news body
+data['header_features'] = data.Headline.apply(lambda x : fe.process(x))
+data['content_features'] = data.articleBody.apply(lambda x : fe.process(x))
+
+
+## generate the similarity features (ordinal)
+
+
 
 
 
