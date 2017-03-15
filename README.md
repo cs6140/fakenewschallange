@@ -11,7 +11,7 @@ Python modules
 2) nltk-stopwords
 3) nltk-wordnet
 4) pandas
-
+5) xgboost
 
 R Modules
 
