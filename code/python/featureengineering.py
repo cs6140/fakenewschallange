@@ -10,7 +10,7 @@ def tokenize(line):
     
     Arguments:
     - `line`:
-    """
+"""
     return line.lower().split()
 
 
@@ -65,6 +65,6 @@ def process(line):
     unigrams = preprocess(tokens)
 
     ## generate bigrams
-    bigrams = list(map(lambda gram : gram[0] + " + " + gram[1], list(generate_ngrams(unigrams, 2))))
-    
-    return unigrams + bigrams
+#    bigrams = list(map(lambda gram : gram[0] + " + " + gram[1], list(generate_ngrams(unigrams, 2))))
+
+    return unigrams
