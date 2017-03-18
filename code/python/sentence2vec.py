@@ -62,3 +62,13 @@ model = doc2vec.Doc2Vec(sentences, size = 300, window = 300, min_count = 1, work
 # https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-lee.ipynb
 
 model.infer_vector(["this","is", "an", "example"])
+
+model.save("../../models/doc2vec.model")
+
+
+# For loading the model :
+model_loaded = doc2vec.Doc2Vec.load('../../models/doc2vec.model')
+
+
+    
+
