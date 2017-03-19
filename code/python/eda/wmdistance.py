@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../")
+
 from gensim import models
 
 import pandas as pd
@@ -5,7 +8,7 @@ import numpy as np
 import featureengineering as fe
 
 
-filename = "../../data/sample.csv"
+filename = "../../../data/sample.csv"
 data = pd.read_csv(filename, sep=',')
 
 
@@ -13,7 +16,7 @@ data['header_features'] = data.Headline.apply(lambda x : fe.process(x))
 data['content_features'] = data.articleBody.apply(lambda x : fe.process(x))
 
 
-
+model = models.Word2Vec.load_word2vec_format('/media/sree/venus/code/word2vec/GoogleNews-vectors-negative300.bin', binary=True)
 
 def sent2vec(words):
     M = []
@@ -32,28 +35,27 @@ def sent2vec(words):
 header_vectors = np.zeros((data.shape[0], 300))
 for i, q in enumerate(data.header_features.values):
     header_vectors[i, :] = sent2vec(q)
-header_series = pd.Series(header_vectors)
-data['header_vector'] = header_series.values
+
+# header_series = pd.Series(header_vectors)
+# data['header_vector'] = header_series.values
 
 
 ## create the content vector    
 content_vectors  = np.zeros((data.shape[0], 300))
-for i, q in enumerate(data.question2.values):
+for i, q in enumerate(data.content_features.values):
     content_vectors[i, :] = sent2vec(q)
-content_series = pd.Series(content_vectors)
-data['content_vector'] = content_series.values
+
+# content_series = pd.Series(content_vectors)
+# data['content_vector'] = content_series.values
 
 
-
-
-model = models.Word2Vec.load_word2vec_format('/media/sree/venus/code/word2vec/GoogleNews-vectors-negative300.bin', binary=True)
 
 # model = KeyedVectors.load_word2vec_format('data/GoogleNews-vectors-negative300.bin.gz', binary=True)
 data['wmd'] = data.apply(lambda x: model.wmdistance(x['header_features'], x['content_features']), axis=1)
 
 
-data['header_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
-data['content_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
+# data['header_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
+# data['content_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
 
 
 ## Word2Vec WMD Distance
