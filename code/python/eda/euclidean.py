@@ -27,15 +27,15 @@ model = doc2vec.Doc2Vec.load('../../../models/doc2vec.model')
 data['header_vector'] = data.header_features.apply(lambda x : model.infer_vector(x))
 data['content_vector'] = data.content_features.apply(lambda x : model.infer_vector(x))
 
-data['cosine_distance'] = data[['header_vector','content_vector']].apply(lambda x: sp.spatial.distance.cosine(*x), axis=1)
+data['euclidean_distance'] = data[['header_vector','content_vector']].apply(lambda x: sp.spatial.distance.euclidean(*x), axis=1)
 
 
 ### we have calculated the cosine distance between header and body
 
 
-### Exploring range of values of cosine distances obtained
-max_cosine = np.max(data.cosine_distance)  ## 1.9628843084637788
-min_cosine = np.min(data.cosine_distance)  ## 0.02141936019460422
+### Exploring range of values of euclidean distances obtained
+max_euclidean = np.max(data.euclidean_distance)  ## 1.9628843084637788
+min_euclidean = np.min(data.euclidean_distance)  ## 0.02141936019460422
 
 
 for stance_level in np.unique(data.Stance):
@@ -43,10 +43,10 @@ for stance_level in np.unique(data.Stance):
 
     print("Statistics for group : " + stance_level)
 
-    ## range of cosines
-    group_max_cosine = np.max(filtered_rows.cosine_distance)  
-    group_min_cosine = np.min(filtered_rows.cosine_distance)
+    ## range of euclideans
+    group_max_euclidean = np.max(filtered_rows.euclidean_distance)  
+    group_min_euclidean = np.min(filtered_rows.euclidean_distance)
 
-    print("Max cosine for range : " , group_max_cosine)
-    print("Min cosine for range : " , group_min_cosine)
+    print("Max euclidean for range : " , group_max_euclidean)
+    print("Min euclidean for range : " , group_min_euclidean)
     
