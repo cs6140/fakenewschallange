@@ -34,7 +34,7 @@ def preprocess(tokens):
     Arguments:
     - `tokens`:
     """
-    processed_words = [lemmatize(word) for word in tokens if not word in stopwords and word.isalpha()]
+    processed_words = [lemmatize(word) for word in tokens if not word in stopwords]
     return processed_words
 
 
