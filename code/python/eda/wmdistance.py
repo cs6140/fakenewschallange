@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append("../")
 
@@ -5,6 +6,7 @@ from gensim import models
 
 import pandas as pd
 import numpy as np
+
 import featureengineering as fe
 
 
@@ -48,8 +50,6 @@ for i, q in enumerate(data.content_features.values):
 # content_series = pd.Series(content_vectors)
 # data['content_vector'] = content_series.values
 
-
-
 # model = KeyedVectors.load_word2vec_format('data/GoogleNews-vectors-negative300.bin.gz', binary=True)
 data['wmd'] = data.apply(lambda x: model.wmdistance(x['header_features'], x['content_features']), axis=1)
 
@@ -59,14 +59,33 @@ data['wmd'] = data.apply(lambda x: model.wmdistance(x['header_features'], x['con
 
 
 ## Word2Vec WMD Distance
-for stance_level in np.unique(data.Stance):
-    filtered_rows = data[(data.Stance == stance_level)]
 
+def toCSV(stance, values):
+    metric = "word_mover_"
+    f = open(metric + stance + "_values.csv", "w")
+
+    try:
+        os.remove(f.name)
+    except OSError:
+        pass
+
+    f = open(metric + stance + "_values.csv", "w")        
+    for i in values:
+        f.write(str(i) + "\n")
+    
+range_of_values = {}
+
+for stance_level in np.unique(data.Stance):
+
+    filtered_rows = data[(data.Stance == stance_level)]
     print("Statistics for group : " + stance_level)
 
     ## range of wmds
     group_max_wmd = np.max(filtered_rows.wmd)  
     group_min_wmd = np.min(filtered_rows.wmd)
 
-    print("Max wmd for range : " , group_max_wmd)
-    print("Min wmd for range : " , group_min_wmd)
+    range_of_values[stance_level] = filtered_rows.wmd.tolist()
+
+    value_list = filtered_rows.wmd.tolist()
+    value_list.sort()
+    toCSV(stance_level, value_list)

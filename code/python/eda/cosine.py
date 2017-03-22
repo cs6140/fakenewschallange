@@ -1,4 +1,4 @@
-import sys
+import sys, os
 sys.path.append("../")
 
 
@@ -77,6 +77,21 @@ data['content_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
 
 
 
+def toCSV(stance, values):
+    metric = "cosine_"
+    f = open(metric + stance + "_values.csv", "w")
+
+    try:
+        os.remove(f.name)
+    except OSError:
+        pass
+
+    f = open(metric + stance + "_values.csv", "w")        
+    for i in values:
+        f.write(str(i) + "\n")
+
+
+range_of_values = {}
 
 for stance_level in np.unique(data.Stance):
     filtered_rows = data[(data.Stance == stance_level)]
@@ -89,3 +104,9 @@ for stance_level in np.unique(data.Stance):
 
     print("Max cosine for range : " , group_max_cosine)
     print("Min cosine for range : " , group_min_cosine)
+
+    range_of_values[stance_level] = filtered_rows.cosine_distance.tolist()
+
+    value_list = filtered_rows.cosine_distance.tolist()
+    value_list.sort()
+    toCSV(stance_level, value_list)
