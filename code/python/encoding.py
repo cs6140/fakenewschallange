@@ -17,3 +17,11 @@ def tovector(words):
     vector_array = np.array(vector_array)
     v = vector_array.sum(axis=0)
     return v / np.sqrt((v ** 2).sum())
+
+
+
+def get_vectorizer_model():
+    """
+    """
+    return model
+    

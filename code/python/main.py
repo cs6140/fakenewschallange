@@ -36,4 +36,10 @@ content_series = pd.Series(content_vectors.tolist())
 data['content_vector'] = content_series.values
 
 
+model = encoding.get_vectorizer_model()
+
 data['cosine_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
+data['euclidean_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.euclidean(*x), axis=1)
+data['wordmover_distance'] = data.apply(lambda x: model.wmdistance(x['header_features'], x['content_features']), axis=1)
+data['minkowski_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.minkowski(*x), axis=1)
+data['canberra_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.canberra(*x), axis=1)
