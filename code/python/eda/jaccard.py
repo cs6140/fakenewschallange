@@ -1,4 +1,4 @@
-import sys, os
+import sys
 sys.path.append("../")
 
 
@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import scipy as sp
 
-import preprocessing as pp
+import featureengineering as pp
 
 
 filename = "../../../data/sample.csv"
@@ -52,7 +52,7 @@ content_series = pd.Series(content_vectors.tolist())
 data['content_vector'] = content_series.values
 
 
-def cosine(u, v):
+def jaccard(u, v):
     """
     
     Arguments:
@@ -61,49 +61,31 @@ def cosine(u, v):
     """
     dist = 0.0
     try:
-        dist = sp.spatial.distance.cosine(u,v)
+        dist = sp.spatial.distance.jaccard(u,v)
     except:
         print("Error")
     return dist
+
+
+
+data['jaccard_distance'] = data[['header_vector','content_vector']].apply(lambda x: jaccard(*x), axis=1)
 
 
 data['header_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
 data['content_vectors'] = data.header_features.apply(lambda x : sent2vec(x))
 
 
-data['cosine_distance'] = data[['header_vector','content_vector']].apply(lambda x: cosine(*x), axis=1)
 
 
-def toCSV(stance, values):
-    metric = "cosine_"
-    f = open(metric + stance + "_values.csv", "w")
-
-    try:
-        os.remove(f.name)
-    except OSError:
-        pass
-
-    f = open(metric + stance + "_values.csv", "w")        
-    for i in values:
-        f.write(str(i) + "\n")
-
-
-range_of_values = {}
 
 for stance_level in np.unique(data.Stance):
     filtered_rows = data[(data.Stance == stance_level)]
 
     print("Statistics for group : " + stance_level)
 
-    ## range of cosines
-    group_max_cosine = np.max(filtered_rows.cosine_distance)  
-    group_min_cosine = np.min(filtered_rows.cosine_distance)
+    ## range of jaccards
+    group_max_jaccard = np.max(filtered_rows.jaccard_distance)  
+    group_min_jaccard = np.min(filtered_rows.jaccard_distance)
 
-    print("Max cosine for range : " , group_max_cosine)
-    print("Min cosine for range : " , group_min_cosine)
-
-    range_of_values[stance_level] = filtered_rows.cosine_distance.tolist()
-
-    value_list = filtered_rows.cosine_distance.tolist()
-    value_list.sort()
-    toCSV(stance_level, value_list)
+    print("Max jaccard for range : " , group_max_jaccard)
+    print("Min jaccard for range : " , group_min_jaccard)

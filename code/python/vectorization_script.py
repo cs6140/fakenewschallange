@@ -2,15 +2,15 @@ from gensim import models
 
 import pandas as pd
 import numpy as np
-import featureengineering as fe
+import featureengineering as pp
 
 
 filename = "../../data/sample.csv"
 data = pd.read_csv(filename, sep=',')
 
 
-data['header_features'] = data.Headline.apply(lambda x : fe.process(x))
-data['content_features'] = data.articleBody.apply(lambda x : fe.process(x))
+data['header_features'] = data.Headline.apply(lambda x : pp.process(x))
+data['content_features'] = data.articleBody.apply(lambda x : pp.process(x))
 
 
 

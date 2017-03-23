@@ -1,10 +1,9 @@
-
 from gensim.models.doc2vec import LabeledSentence
 from gensim.models import doc2vec
 
 
 import pandas as pd
-import featureengineering as fe
+import featureengineering as pp
 
 
 ## Reference : http://stackoverflow.com/questions/22129943/how-to-calculate-the-sentence-similarity-using-word2vec-model-of-gensim-with-pyt
@@ -30,8 +29,8 @@ def make_sentences(words, label = False):
 
 
 
-data['header_features'] = data.Headline.apply(lambda x : fe.process(x))
-data['content_features'] = data.articleBody.apply(lambda x : fe.process(x))
+data['header_features'] = data.Headline.apply(lambda x : pp.process(x))
+data['content_features'] = data.articleBody.apply(lambda x : pp.process(x))
 
 data['all_words'] = data.header_features + data.content_features
 

@@ -1,5 +1,9 @@
 import pandas as pd
-import featureengineering as fe
+
+import preprocessing as pp
+import encoding
+import features
+import numpy as np
 
 
 
@@ -9,32 +13,26 @@ data = pd.read_csv(filename, sep=',')
 
 
 ## generate necessary token features for dnews heading and news body
-data['header_features'] = data.Headline.apply(lambda x : fe.process(x))
-data['content_features'] = data.articleBody.apply(lambda x : fe.process(x))
+data['header_features'] = data.Headline.apply(lambda x : pp.process(x))
+data['content_features'] = data.articleBody.apply(lambda x : pp.process(x))
 
 
 ## generate the similarity features (ordinal)
+header_vectors = np.zeros((data.shape[0], 300))
+for i, q in enumerate(data.header_features.values):
+    header_vectors[i, :] = encoding.tovector(q)
+
+## create the content vector    
+content_vectors  = np.zeros((data.shape[0], 300))
+for i, q in enumerate(data.content_features.values):
+    content_vectors[i, :] = encoding.tovector(q)
 
 
+header_series = pd.Series(header_vectors.tolist())
+data['header_vector'] = header_series.values
+    
+content_series = pd.Series(content_vectors.tolist())
+data['content_vector'] = content_series.values
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+data['cosine_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
