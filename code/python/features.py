@@ -13,12 +13,10 @@ def cosine(u, v):
     - `v`:
     """
     dist = 0.0
-    import pdb;
-    pdb.set_trace()
     try:
         dist = sp.spatial.distance.cosine(u,v)
     except:
-        print("Error")
+        print("Error...Returning 0.0")
     return dist
 
 

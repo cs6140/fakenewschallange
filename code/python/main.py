@@ -11,6 +11,7 @@ import numpy as np
 filename = "../../data/train.csv"
 data = pd.read_csv(filename, sep=',')
 
+#data = data.sample(frac=0.05)
 
 ## generate necessary token features for dnews heading and news body
 data['header_features'] = data.Headline.apply(lambda x : pp.process(x))
