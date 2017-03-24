@@ -6,7 +6,6 @@ import features
 import numpy as np
 
 
-
 ## read the  joined csv file
 filename = "../../data/train.csv"
 data = pd.read_csv(filename, sep=',')
