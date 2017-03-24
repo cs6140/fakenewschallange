@@ -1,5 +1,5 @@
 import nltk
-
+from unicodedata import category
 
 stopwords = nltk.corpus.stopwords.words('english')
 word_lemmatizer = nltk.WordNetLemmatizer()
@@ -10,7 +10,8 @@ def tokenize(line):
     
     Arguments:
     - `line`:
-"""
+    """
+    line = ''.join(ch for ch in line if category(ch)[0] != 'P')
     return line.lower().split()
 
 
@@ -34,7 +35,7 @@ def preprocess(tokens):
     Arguments:
     - `tokens`:
     """
-    processed_words = [lemmatize(word) for word in tokens if not word in stopwords]
+    processed_words = [lemmatize(word) for word in tokens if not word in stopwords and len(word)>3]
     return processed_words
 
 
