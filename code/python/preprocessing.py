@@ -4,7 +4,7 @@ from nltk.stem.snowball import SnowballStemmer
 
 stopwords = nltk.corpus.stopwords.words('english')
 word_lemmatizer = nltk.WordNetLemmatizer()
-stemmer = SnowballStemmer("english")
+#stemmer = SnowballStemmer("english")
 
 def tokenize(line):
     """
@@ -36,7 +36,7 @@ def preprocess(tokens):
     Arguments:
     - `tokens`:
     """
-    processed_words = [stemmer.stem(word) for word in tokens if not word in stopwords and len(word)>3]
+    processed_words = [lemmatize(word) for word in tokens if not word in stopwords and len(word)>3]
     return processed_words
 
 

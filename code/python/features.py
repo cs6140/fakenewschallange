@@ -3,6 +3,16 @@ import scipy as sp
 
 
 
+def overlapping(headline, body):
+    """
+    
+    Arguments:
+    - `headline`:
+    - `body`:
+    """
+    return len(set(headline).intersection(body)) / float(len(set(headline).union(body)))
+
+
 
 
 def cosine(u, v):
