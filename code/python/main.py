@@ -1,52 +1,69 @@
 import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+
 
 import preprocessing as pp
-# import encoding
-import features
+#import encoding
 import classifier
-import numpy as np
+import features
 
 
-## read the  joined csv file
-filename = "../../data/train.csv"
-data = pd.read_csv(filename, sep=',')
+bodies = "../../data/train_bodies.csv"
+stances = "../../data/train_stances.csv"
 
-#data = data.sample(frac=0.05)
+content = pd.read_csv(bodies, sep=",")
+headlines = pd.read_csv(stances, sep=",")
+
 
 ## generate necessary token features for dnews heading and news body
-data['header_features'] = data.Headline.apply(lambda x : pp.process(x))
-data['content_features'] = data.articleBody.apply(lambda x : pp.process(x))
+content['content_tokens'] = content.articleBody.apply(lambda x : pp.process(x))
+headlines['headline_tokens'] = headlines.Headline.apply(lambda x: pp.process(x))
 
-data['overlapping'] = data[['header_features','content_features']].apply(lambda x: features.overlapping(*x), axis=1)
 
-## XGBoost classifier
-gbm = classifier.classify_XGB(data)
-print("XGBoost classifier built...")
-
-# ## generate the similarity features (ordinal)
-# header_vectors = np.zeros((data.shape[0], 300))
-# for i, q in enumerate(data.header_features.values):
+# ## Begin sentence embedding
+# header_vectors = np.zeros((headlines.shape[0], 300))
+# for i, q in enumerate(headlines.headline_tokens.values):
 #     header_vectors[i, :] = encoding.tovector(q)
 
 # ## create the content vector    
-# content_vectors  = np.zeros((data.shape[0], 300))
-# for i, q in enumerate(data.content_features.values):
+# content_vectors  = np.zeros((content.shape[0], 300))
+# for i, q in enumerate(content.content_tokens.values):
 #     content_vectors[i, :] = encoding.tovector(q)
 
 
 # header_series = pd.Series(header_vectors.tolist())
-# data['header_vector'] = header_series.values
+# headlines['headline_vector'] = header_series.values
     
 # content_series = pd.Series(content_vectors.tolist())
-# data['content_vector'] = content_series.values
+# content['content_vector'] = content_series.values
 
-# import pdb
-# pdb.set_trace()
 
-# model = encoding.get_vectorizer_model()
+data = pd.merge(content, headlines, how="left", on="Body ID")
 
-# data['cosine_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
-# data['euclidean_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.euclidean(*x), axis=1)
-# data['wordmover_distance'] = data.apply(lambda x: model.wmdistance(x['header_features'], x['content_features']), axis=1)
-# data['minkowski_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.minkowski(*x), axis=1)
-# data['canberra_distance'] = data[['header_vector','content_vector']].apply(lambda x: features.canberra(*x), axis=1)
+
+## Feature 1 - Words overlapping between headline and content
+data['overlapping'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.overlapping(*x), axis=1)
+
+train, test = train_test_split(data, test_size = 0.2)
+
+## XGBoost classifier
+gbm = classifier.train_XGB(train)
+print("XGBoost classifier built...")
+
+
+## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
+## we need to confirm this
+_test = test[['overlapping']]
+_predictions = gbm.predict(_test)
+
+predictions = pd.Series(_predictions.tolist())
+test["predicted"] = predictions.values
+
+
+## Accuracy calculation
+test["is_correct_prediction"] = test["Stance"] == test["predicted"]
+correctly_predicted_rows = test[test['is_correct_prediction'] == True]
+
+print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+
