@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 import preprocessing as pp
 #import encoding
-#import classifier
+import classifier
 import features
 
 bodies = "../../data/train_bodies.csv"
@@ -78,4 +78,3 @@ test["is_correct_prediction"] = test["Stance"] == test["predicted"]
 correctly_predicted_rows = test[test['is_correct_prediction'] == True]
 
 print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
-
