@@ -12,6 +12,7 @@ Python modules
 3) nltk-wordnet
 4) pandas
 5) xgboost
+6) seaborn
 
 R Modules
 
