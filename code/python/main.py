@@ -1,20 +1,19 @@
 import pandas as pd
+pd.set_option('max_rows', 7)
+pd.set_option('expand_frame_repr', False)
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-
 import preprocessing as pp
 #import encoding
-import classifier
+#import classifier
 import features
-
 
 bodies = "../../data/train_bodies.csv"
 stances = "../../data/train_stances.csv"
 
 content = pd.read_csv(bodies, sep=",")
 headlines = pd.read_csv(stances, sep=",")
-
 
 ## generate necessary token features for dnews heading and news body
 content['content_tokens'] = content.articleBody.apply(lambda x : pp.process(x))
@@ -41,9 +40,22 @@ headlines['headline_tokens'] = headlines.Headline.apply(lambda x: pp.process(x))
 
 data = pd.merge(content, headlines, how="left", on="Body ID")
 
+data['char_length_body']=data['articleBody'].str.len()
+data['char_length_headline']=data['Headline'].str.len()
 
-## Feature 1 - Words overlapping between headline and content
+
+ #Feature 1 - Words overlapping between headline and content
 data['overlapping'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.overlapping(*x), axis=1)
+
+import visualization as viz
+#Calling summary statistics from visualization.py
+viz.summaryStatistics(data)
+
+#Calling plots from visualization.py
+viz.plot_overlapping(data)
+viz.plot_HLS(data)
+viz.plot_CLS(data)
+viz.plot_headlineLength(data)
 
 train, test = train_test_split(data, test_size = 0.2)
 
