@@ -1,10 +1,12 @@
 import scipy as sp
-
+from collections import Counter
 
 
 
 def overlapping(headline, body):
     """
+    
+       Ratio of intersection upon union of tokens
     
     Arguments:
     - `headline`:
@@ -15,6 +17,48 @@ def overlapping(headline, body):
 
 
 
+def generate_ngrams(input_list, n):
+    """
+    generate n grams
+
+    pass 2 to get bigrams
+    pass 3 to get bigrams
+    
+    Arguments:
+    - `tokens`:
+    """
+    return zip(*[input_list[i:] for i in range(n)])
+    
+
+def count_grams(headline, body, n):
+    """
+    
+    Arguments:
+    - `headline`:
+    - `body`:
+    - `n`:
+    """
+    headline_ngrams = list(generate_ngrams(headline, n))
+    body_ngrams = list(generate_ngrams(body, n))
+
+    reoccuring_grams = [gram for gram in headline_ngrams if gram in body_ngrams]
+    counts = Counter(reoccuring_grams)
+    return sum(counts.values())
+    
+
+
+    
+def freqency_features(headline, body):
+    """
+    
+    Arguments:
+    - `headline`:
+    - `body`:
+    """
+    return [count_grams(headline, body, i) for i in range(1,7)]
+  
+
+    
 def cosine(u, v):
     """
     
