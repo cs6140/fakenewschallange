@@ -99,4 +99,3 @@ test["is_correct_prediction"] = test["Stance"] == test["predicted"]
 correctly_predicted_rows = test[test['is_correct_prediction'] == True]
 
 print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
-
