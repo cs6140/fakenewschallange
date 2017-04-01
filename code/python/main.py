@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 import preprocessing as pp
-#import encoding
+import encoding
 import classifier
 import features
 
@@ -21,21 +21,21 @@ headlines['headline_tokens'] = headlines.Headline.apply(lambda x: pp.process(x))
 
 
 # ## Begin sentence embedding
-# header_vectors = np.zeros((headlines.shape[0], 300))
-# for i, q in enumerate(headlines.headline_tokens.values):
-#     header_vectors[i, :] = encoding.tovector(q)
+header_vectors = np.zeros((headlines.shape[0], 300))
+for i, q in enumerate(headlines.headline_tokens.values):
+    header_vectors[i, :] = encoding.tovector(q)
 
 # ## create the content vector    
-# content_vectors  = np.zeros((content.shape[0], 300))
-# for i, q in enumerate(content.content_tokens.values):
-#     content_vectors[i, :] = encoding.tovector(q)
+content_vectors  = np.zeros((content.shape[0], 300))
+for i, q in enumerate(content.content_tokens.values):
+    content_vectors[i, :] = encoding.tovector(q)
 
 
-# header_series = pd.Series(header_vectors.tolist())
-# headlines['headline_vector'] = header_series.values
+header_series = pd.Series(header_vectors.tolist())
+headlines['headline_vector'] = header_series.values
     
-# content_series = pd.Series(content_vectors.tolist())
-# content['content_vector'] = content_series.values
+content_series = pd.Series(content_vectors.tolist())
+content['content_vector'] = content_series.values
 
 
 data = pd.merge(content, headlines, how="left", on="Body ID")
@@ -51,7 +51,6 @@ data['phrase_reoccurance'] = data[['headline_tokens','content_tokens']].apply(la
 ## stupid code - boo !
 reoccurance_cols = ["reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6"]
 for i in range(0,6) :
-    print(i)
     data[reoccurance_cols[i]] = data['phrase_reoccurance'].apply(lambda x: x[i])
 
 ## visualization of variation with Stance value

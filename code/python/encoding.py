@@ -1,9 +1,5 @@
 from gensim import models
-
 import numpy as np
-
-
-
 
 model = models.Word2Vec.load_word2vec_format('/media/sree/venus/code/word2vec/GoogleNews-vectors-negative300.bin', binary=True)
 
