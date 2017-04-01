@@ -49,15 +49,24 @@ data['overlapping'] = data[['headline_tokens','content_tokens']].apply(lambda x:
 
 import visualization as viz
 #Calling summary statistics from visualization.py
-viz.summaryStatistics(data)
+#viz.summaryStatistics(data)
+
 
 #Calling plots from visualization.py
 viz.plot_overlapping(data)
 viz.plot_HLS(data)
-viz.plot_CLS(data)
-viz.plot_headlineLength(data)
+# viz.plot_CLS(data)
+# viz.plot_headlineLength(data)
 
 train, test = train_test_split(data, test_size = 0.2)
+print(type(train))
+
+viz.summaryStatistics(train)
+viz.plot_overlapping(train)
+viz.plot_HLS(train)
+viz.plot_CLS(train)
+#viz.dataFrame_CSV(train)
+
 
 ## XGBoost classifier
 gbm = classifier.train_XGB(train)

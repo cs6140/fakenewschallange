@@ -5,12 +5,14 @@ import matplotlib.pyplot as plt
 
 # Plot the overlapping ratio with respect to Stance
 def plot_overlapping(dataFrame):
+    #sns.set(style="whitegrid")
     sns.lmplot('Body ID','overlapping', data = dataFrame, hue='Stance',fit_reg=False)
     plt.show()
 
  # Plot the character length headline
 def plot_headlineLength(dataFrame):
     dataFrame['char_length_headline'].plot()
+    plt.show()
 
 def plot_HLS(dataFrame):
     sns.lmplot('Body ID','char_length_headline', data = dataFrame, hue='Stance',fit_reg=False)
