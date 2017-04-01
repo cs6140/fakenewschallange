@@ -53,6 +53,9 @@ reoccurance_cols = ["reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", 
 for i in range(0,6) :
     data[reoccurance_cols[i]] = data['phrase_reoccurance'].apply(lambda x: x[i])
 
+## Cosine similarity between word vectors
+data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
+
 ## visualization of variation with Stance value
 ## data[['phrase_reoccurance','Stance']][1:10]
 
@@ -75,7 +78,7 @@ print("XGBoost classifier built...")
 
 ## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
 ## we need to confirm this
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine"]]
 _predictions = gbm.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
