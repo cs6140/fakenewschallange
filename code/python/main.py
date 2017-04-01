@@ -44,8 +44,18 @@ data['char_length_body']=data['articleBody'].str.len()
 data['char_length_headline']=data['Headline'].str.len()
 
 
- #Feature 1 - Words overlapping between headline and content
+#Feature 1 - Words overlapping between headline and content
 data['overlapping'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.overlapping(*x), axis=1)
+data['phrase_reoccurance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.freqency_features(*x), axis=1)
+
+## stupid code - boo !
+reoccurance_cols = ["reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6"]
+for i in range(0,6) :
+    print(i)
+    data[reoccurance_cols[i]] = data['phrase_reoccurance'].apply(lambda x: x[i])
+
+## visualization of variation with Stance value
+## data[['phrase_reoccurance','Stance']][1:10]
 
 import visualization as viz
 #Calling summary statistics from visualization.py
@@ -66,7 +76,7 @@ print("XGBoost classifier built...")
 
 ## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
 ## we need to confirm this
-_test = test[['overlapping']]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6"]]
 _predictions = gbm.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
@@ -78,3 +88,4 @@ test["is_correct_prediction"] = test["Stance"] == test["predicted"]
 correctly_predicted_rows = test[test['is_correct_prediction'] == True]
 
 print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+
