@@ -1,7 +1,9 @@
 import scipy as sp
 from collections import Counter
+import encoding
 
 
+model = encoding.get_vectorizer_model()
 
 def overlapping(headline, body):
     """
@@ -101,7 +103,7 @@ def wmdistance(u, v):
     """
     dist = 0.0
     try:
-        dist = sp.spatial.distance.euclidean(u,v)
+        dist = model.wmdistance(u,v)
     except:
         print("Error...Returning 0.0")
     return dist

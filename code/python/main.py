@@ -3,6 +3,7 @@ pd.set_option('max_rows', 7)
 pd.set_option('expand_frame_repr', False)
 import numpy as np
 from sklearn.model_selection import train_test_split
+#from fuzzy import fuzz
 
 import preprocessing as pp
 import encoding
@@ -53,8 +54,11 @@ reoccurance_cols = ["reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", 
 for i in range(0,6) :
     data[reoccurance_cols[i]] = data['phrase_reoccurance'].apply(lambda x: x[i])
 
+
 ## Cosine similarity between word vectors
 data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
+data['wmdistance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.wmdistance(*x), axis=1)
+data['euclidean'] = data[['headline_vector','content_vector']].apply(lambda x: features.euclidean(*x), axis=1)
 
 ## visualization of variation with Stance value
 ## data[['phrase_reoccurance','Stance']][1:10]
@@ -73,10 +77,10 @@ viz.plot_HLS(data)
 train, test = train_test_split(data, test_size = 0.2)
 print(type(train))
 
-viz.summaryStatistics(train)
-viz.plot_overlapping(train)
-viz.plot_HLS(train)
-viz.plot_CLS(train)
+# viz.summaryStatistics(train)
+# viz.plot_overlapping(train)
+# viz.plot_HLS(train)
+# viz.plot_CLS(train)
 #viz.dataFrame_CSV(train)
 
 
@@ -87,7 +91,7 @@ print("XGBoost classifier built...")
 
 ## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
 ## we need to confirm this
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine","wmdistance","euclidean"]]
 _predictions = gbm.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
