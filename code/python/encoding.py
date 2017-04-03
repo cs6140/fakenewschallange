@@ -1,7 +1,12 @@
-from gensim import models
+from gensim.models.keyedvectors import KeyedVectors
+
 import numpy as np
 
-model = models.Word2Vec.load_word2vec_format('/media/sree/venus/code/word2vec/GoogleNews-vectors-negative300.bin', binary=True)
+
+
+
+model = KeyedVectors.load_word2vec_format('C:/Users/AKHIL NAIR/Documents/Project CS6140/GoogleNews-vectors-negative300.bin.gz', binary=True)
+
 
 def tovector(words):
     vector_array = []

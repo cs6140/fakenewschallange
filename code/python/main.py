@@ -15,6 +15,7 @@ stances = "../../data/train_stances.csv"
 content = pd.read_csv(bodies, sep=",")
 headlines = pd.read_csv(stances, sep=",")
 
+
 ## generate necessary token features for dnews heading and news body
 content['content_tokens'] = content.articleBody.apply(lambda x : pp.process(x))
 headlines['headline_tokens'] = headlines.Headline.apply(lambda x: pp.process(x))
@@ -59,24 +60,24 @@ data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: feat
 ## visualization of variation with Stance value
 ## data[['phrase_reoccurance','Stance']][1:10]
 
-import visualization as viz
+#import visualization as viz
 #Calling summary statistics from visualization.py
 #viz.summaryStatistics(data)
 
 
 #Calling plots from visualization.py
-viz.plot_overlapping(data)
-viz.plot_HLS(data)
+#viz.plot_overlapping(data)
+#viz.plot_HLS(data)
 # viz.plot_CLS(data)
 # viz.plot_headlineLength(data)
 
 train, test = train_test_split(data, test_size = 0.2)
-print(type(train))
+#print(type(train))
 
-viz.summaryStatistics(train)
-viz.plot_overlapping(train)
-viz.plot_HLS(train)
-viz.plot_CLS(train)
+#viz.summaryStatistics(train)
+#viz.plot_overlapping(train)
+#viz.plot_HLS(train)
+#viz.plot_CLS(train)
 #viz.dataFrame_CSV(train)
 
 
@@ -95,6 +96,21 @@ test["predicted"] = predictions.values
 
 
 ## Accuracy calculation
+test["is_correct_prediction"] = test["Stance"] == test["predicted"]
+correctly_predicted_rows = test[test['is_correct_prediction'] == True]
+
+print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+
+clf = classifier.train_SVM(train)
+print("SVM Classifier")
+
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine"]]
+
+_predictions = clf.predict(_test)
+
+predictions = pd.Series(_predictions.tolist())
+test["predicted"] = predictions.values
+
 test["is_correct_prediction"] = test["Stance"] == test["predicted"]
 correctly_predicted_rows = test[test['is_correct_prediction'] == True]
 
