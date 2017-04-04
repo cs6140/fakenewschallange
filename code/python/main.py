@@ -64,33 +64,8 @@ data['euclidean'] = data[['headline_vector','content_vector']].apply(lambda x: f
 ## visualization of variation with Stance value
 ## data[['phrase_reoccurance','Stance']][1:10]
 
-#import visualization as viz
-#Calling summary statistics from visualization.py
-#viz.summaryStatistics(data)
-
-
-#Calling plots from visualization.py
-#viz.plot_overlapping(data)
-#viz.plot_HLS(data)
-# viz.plot_CLS(data)
-# viz.plot_headlineLength(data)
-
-train, test = train_test_split(data, test_size = 0.2)
+train, test = train_test_split(data, test_size = 0.2,random_state= 55)
 #print(type(train))
-
-<<<<<<< HEAD
-#viz.summaryStatistics(train)
-#viz.plot_overlapping(train)
-#viz.plot_HLS(train)
-#viz.plot_CLS(train)
-=======
-# viz.summaryStatistics(train)
-# viz.plot_overlapping(train)
-# viz.plot_HLS(train)
-# viz.plot_CLS(train)
->>>>>>> 7fafaaef1c972a0de2ee95d6e1a281f22e6f7331
-#viz.dataFrame_CSV(train)
-
 
 ## XGBoost classifier
 gbm = classifier.train_XGB(train)
@@ -99,18 +74,20 @@ print("XGBoost classifier built...")
 
 ## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
 ## we need to confirm this
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine","wmdistance","euclidean"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine",
+              "wmdistance", "euclidean"]]
 _predictions = gbm.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
-test["predicted"] = predictions.values
+test["predicted_XGB"] = predictions.values
 
 
 ## Accuracy calculation
-test["is_correct_prediction"] = test["Stance"] == test["predicted"]
-correctly_predicted_rows = test[test['is_correct_prediction'] == True]
+test["is_correct_prediction_XGB"] = test["Stance"] == test["predicted_XGB"]
+correctly_predicted_rows = test[test['is_correct_prediction_XGB'] == True]
 
 print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+
 
 clf = classifier.train_SVM(train)
 print("SVM Classifier")
@@ -120,9 +97,38 @@ _test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "re
 _predictions = clf.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
-test["predicted"] = predictions.values
+test["predicted_SVM"] = predictions.values
 
-test["is_correct_prediction"] = test["Stance"] == test["predicted"]
-correctly_predicted_rows = test[test['is_correct_prediction'] == True]
+test["is_correct_prediction_SVM"] = test["Stance"] == test["predicted_SVM"]
+correctly_predicted_rows = test[test['is_correct_prediction_SVM'] == True]
 
 print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+
+# ---------------------------------------- Random Forest Classifier -----------------------------------------------------------#
+
+print("Random Forest classifier building...")
+rfc = classifier.randomForest(train,test)
+print("Random Forest classifier built ...")
+
+# ----------------------------------------- Cross Tabulation --------------------------------------------------------------------#
+
+print("\n Cross Tabulation for XGBOOST ",)
+print (pd.crosstab(test.Stance, test.predicted_XGB))
+
+print("\n Cross Tabulation for RANDOM FOREST ")
+print (pd.crosstab(test.Stance, test.predicted_RF))
+
+print("\n Cross Tabulation for SVM  ")
+print (pd.crosstab(test.Stance, test.predicted_SVM))
+
+# ----------------------------------------  Visualization / Plots  ------------------------------------------------------------#
+
+import visualization as viz
+
+#viz.summaryStatistics(train)
+#viz.plot_overlapping(train)
+#viz.plot_HLS(train)
+#viz.plot_CLS(train)
+
+#viz.summaryStatistics(test)
+
