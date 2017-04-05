@@ -9,6 +9,7 @@ import preprocessing as pp
 import encoding
 import classifier
 import features
+import visualization as viz
 
 bodies = "../../data/train_bodies.csv"
 stances = "../../data/train_stances.csv"
@@ -27,7 +28,7 @@ header_vectors = np.zeros((headlines.shape[0], 300))
 for i, q in enumerate(headlines.headline_tokens.values):
     header_vectors[i, :] = encoding.tovector(q)
 
-# ## create the content vector    
+# ## create the content vector
 content_vectors  = np.zeros((content.shape[0], 300))
 for i, q in enumerate(content.content_tokens.values):
     content_vectors[i, :] = encoding.tovector(q)
@@ -35,7 +36,7 @@ for i, q in enumerate(content.content_tokens.values):
 
 header_series = pd.Series(header_vectors.tolist())
 headlines['headline_vector'] = header_series.values
-    
+
 content_series = pd.Series(content_vectors.tolist())
 content['content_vector'] = content_series.values
 
@@ -57,16 +58,24 @@ for i in range(0,6) :
 
 
 ## Cosine similarity between word vectors
-data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
-data['wmdistance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.wmdistance(*x), axis=1)
+# data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
+# #data['wmdistance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.wmdistance(*x), axis=1)
 data['euclidean'] = data[['headline_vector','content_vector']].apply(lambda x: features.euclidean(*x), axis=1)
 
-## visualization of variation with Stance value
-## data[['phrase_reoccurance','Stance']][1:10]
 
+# 80/20 Train-Test Split keeping splits consistent for future runs
 train, test = train_test_split(data, test_size = 0.2,random_state= 55)
-#print(type(train))
 
+# ----------------------------------------------- Training Data Exploration/Visulation --------------------------------- #
+
+#viz.summaryStatistics(train)
+viz.plot_overlapping(train)
+viz.plot_HLS(train)
+viz.plot_CLS(train)
+viz.pairPlot(train)
+viz.feature_bodyLength(train)
+viz.countPlot_headline_article(train)
+# ---------------------------------------------------------------------------------------------------------------------#
 ## XGBoost classifier
 gbm = classifier.train_XGB(train)
 print("XGBoost classifier built...")
@@ -74,8 +83,7 @@ print("XGBoost classifier built...")
 
 ## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
 ## we need to confirm this
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine",
-              "wmdistance", "euclidean"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3","reoccur4", "reoccur5", "reoccur6","euclidean"]]#,"cosine"#,"wmdistance", "euclidean"]]
 _predictions = gbm.predict(_test)
 
 predictions = pd.Series(_predictions.tolist())
@@ -92,7 +100,7 @@ print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
 clf = classifier.train_SVM(train)
 print("SVM Classifier")
 
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","cosine"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","euclidean"]]
 
 _predictions = clf.predict(_test)
 
@@ -121,14 +129,20 @@ print (pd.crosstab(test.Stance, test.predicted_RF))
 print("\n Cross Tabulation for SVM  ")
 print (pd.crosstab(test.Stance, test.predicted_SVM))
 
-# ----------------------------------------  Visualization / Plots  ------------------------------------------------------------#
-
-import visualization as viz
-
-#viz.summaryStatistics(train)
-#viz.plot_overlapping(train)
-#viz.plot_HLS(train)
-#viz.plot_CLS(train)
+# ----------------------------------------  Test Data Visualization / Plots  ------------------------------------------------------------#
 
 #viz.summaryStatistics(test)
+
+# Bar Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
+viz.countPlot(test)
+
+# Compare Countplots of Random Forest, XGBoost, SVM on test set
+viz.compare_countPlots(test)
+
+# Swarm Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
+#viz.swarmPlot(test)
+
+
+
+
 
