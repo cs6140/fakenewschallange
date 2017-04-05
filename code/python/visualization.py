@@ -58,11 +58,13 @@ def swarmPlot(dataFrame):
     plt.show()
 
 def compare_countPlots(dataFrame):
-    fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
+    fig,(ax1, ax2, ax3) = plt.subplots(ncols=3, sharey=False)
     c1 = sns.countplot(x="predicted_XGB", data=dataFrame, palette="Greens_d",ax=ax1,order=['unrelated','discuss','agree','disagree'],)
     c1.set(xlabel='Predicted Stances (Using XGBoost)', ylabel = 'Count')
-    c2 = sns.countplot(x="predicted_RF", data=dataFrame, palette="Greens_d",ax = ax2,order=['unrelated','discuss','agree','disagree'])
+    c2 = sns.countplot(x="predicted_RF", data=dataFrame, palette="Reds_d",ax = ax2,order=['unrelated','discuss','agree','disagree'])
     c2.set(xlabel='Predicted Stances (Using Random Forest)', ylabel = 'Count')
+    c3 = sns.countplot(x="predicted_SVM", data=dataFrame, palette="Greens_d",ax = ax3,order=['unrelated','discuss','agree','disagree'])
+    c3.set(xlabel='Predicted Stances (Using SVM)', ylabel = 'Count')
     plt.show()
 
 def pairPlot(dataFrame):

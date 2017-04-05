@@ -121,13 +121,13 @@ print("Random Forest classifier built ...")
 # ----------------------------------------- Cross Tabulation --------------------------------------------------------------------#
 
 print("\n Cross Tabulation for XGBOOST ",)
-print (pd.crosstab(test.Stance, test.predicted_XGB))
+print (pd.crosstab(test.Stance, test.predicted_XGB,margins=True))
 
 print("\n Cross Tabulation for RANDOM FOREST ")
-print (pd.crosstab(test.Stance, test.predicted_RF))
+print (pd.crosstab(test.Stance, test.predicted_RF,margins=True))
 
 print("\n Cross Tabulation for SVM  ")
-print (pd.crosstab(test.Stance, test.predicted_SVM))
+print (pd.crosstab(test.Stance, test.predicted_SVM,margins=True))
 
 # ----------------------------------------  Test Data Visualization / Plots  ------------------------------------------------------------#
 
