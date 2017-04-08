@@ -58,7 +58,7 @@ for i in range(0,6) :
 
 
 ## Cosine similarity between word vectors
-# data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
+data['cosine'] = data[['headline_vector','content_vector']].apply(lambda x: features.cosine(*x), axis=1)
 # #data['wmdistance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.wmdistance(*x), axis=1)
 data['euclidean'] = data[['headline_vector','content_vector']].apply(lambda x: features.euclidean(*x), axis=1)
 
@@ -68,13 +68,16 @@ train, test = train_test_split(data, test_size = 0.2,random_state= 55)
 
 # ----------------------------------------------- Training Data Exploration/Visulation --------------------------------- #
 
-viz.summaryStatistics(train)
-viz.plot_overlapping(train)
-viz.plot_HLS(train)
-viz.plot_CLS(train)
+#viz.summaryStatistics(train)
+# viz.plot_overlapping(train)
+# viz.plot_HLS(train)
+# viz.plot_CLS(train)
+
+# viz.feature_bodyLength(train)
+# viz.countPlot_headline_article(train)
+viz.pointPlot(train)
 viz.pairPlot(train)
-viz.feature_bodyLength(train)
-viz.countPlot_headline_article(train)
+#viz.dataFrame_CSV(train)
 # ---------------------------------------------------------------------------------------------------------------------#
 ## XGBoost classifier
 gbm = classifier.train_XGB(train, test)
@@ -128,7 +131,7 @@ viz.countPlot(test)
 viz.compare_countPlots(test)
 
 # Swarm Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
-viz.swarmPlot(test)
+#viz.swarmPlot(test)
 
 
 
