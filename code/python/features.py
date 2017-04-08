@@ -1,11 +1,7 @@
 import scipy as sp
 from collections import Counter
-<<<<<<< HEAD
 import sklearn.feature_extraction.text
-=======
 import encoding
-
->>>>>>> 7fafaaef1c972a0de2ee95d6e1a281f22e6f7331
 
 model = encoding.get_vectorizer_model()
 

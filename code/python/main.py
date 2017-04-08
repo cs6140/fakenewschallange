@@ -68,7 +68,7 @@ train, test = train_test_split(data, test_size = 0.2,random_state= 55)
 
 # ----------------------------------------------- Training Data Exploration/Visulation --------------------------------- #
 
-#viz.summaryStatistics(train)
+viz.summaryStatistics(train)
 viz.plot_overlapping(train)
 viz.plot_HLS(train)
 viz.plot_CLS(train)
@@ -77,24 +77,12 @@ viz.feature_bodyLength(train)
 viz.countPlot_headline_article(train)
 # ---------------------------------------------------------------------------------------------------------------------#
 ## XGBoost classifier
-gbm = classifier.train_XGB(train)
+gbm = classifier.train_XGB(train, test)
 print("XGBoost classifier built...")
 
 
-## XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
-## we need to confirm this
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3","reoccur4", "reoccur5", "reoccur6","euclidean"]]#,"cosine"#,"wmdistance", "euclidean"]]
-_predictions = gbm.predict(_test)
-
-predictions = pd.Series(_predictions.tolist())
-test["predicted_XGB"] = predictions.values
-
-
-## Accuracy calculation
-test["is_correct_prediction_XGB"] = test["Stance"] == test["predicted_XGB"]
-correctly_predicted_rows = test[test['is_correct_prediction_XGB'] == True]
-
-print("Accuracy : ", float(len(correctly_predicted_rows))/len(test))
+# XGBoost only accepts numerical fields - So I'm gonna remove the rest from test data
+# we need to confirm this
 
 
 clf = classifier.train_SVM(train)
@@ -140,7 +128,7 @@ viz.countPlot(test)
 viz.compare_countPlots(test)
 
 # Swarm Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
-#viz.swarmPlot(test)
+viz.swarmPlot(test)
 
 
 
