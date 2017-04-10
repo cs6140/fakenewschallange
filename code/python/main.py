@@ -43,13 +43,23 @@ content['content_vector'] = content_series.values
 
 data = pd.merge(content, headlines, how="left", on="Body ID")
 
+viz.summaryStatistics(data)
+
 data['char_length_body']=data['articleBody'].str.len()
 data['char_length_headline']=data['Headline'].str.len()
+
 
 
 #Feature 1 - Words overlapping between headline and content
 data['overlapping'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.overlapping(*x), axis=1)
 data['phrase_reoccurance'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.freqency_features(*x), axis=1)
+
+#Refuting Features
+data['refuting_feature'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.refuting_features(*x), axis=1)
+print("Computed Refuting Features")
+data['refuting_feature_count'] = data[['headline_tokens','content_tokens']].apply(lambda x: features.refuting_features_count(*x), axis=1)
+print("Computed Refuting Features count",data)
+
 
 ## stupid code - boo !
 reoccurance_cols = ["reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6"]
@@ -67,6 +77,10 @@ data['euclidean'] = data[['headline_vector','content_vector']].apply(lambda x: f
 train, test = train_test_split(data, test_size = 0.2,random_state= 55)
 
 # ----------------------------------------------- Training Data Exploration/Visulation --------------------------------- #
+viz.boxplot_overlapping(train)
+viz.boxplot_ngrams(train)
+viz.pairPlot(train)
+
 
 #viz.summaryStatistics(train)
 # viz.plot_overlapping(train)
@@ -75,9 +89,10 @@ train, test = train_test_split(data, test_size = 0.2,random_state= 55)
 
 # viz.feature_bodyLength(train)
 # viz.countPlot_headline_article(train)
-viz.pointPlot(train)
-viz.pairPlot(train)
+#viz.pointPlot(train)
+
 #viz.dataFrame_CSV(train)
+#viz.dataFrame_CSV(data)
 # ---------------------------------------------------------------------------------------------------------------------#
 ## XGBoost classifier
 gbm = classifier.train_XGB(train, test)
@@ -91,7 +106,7 @@ print("XGBoost classifier built...")
 clf = classifier.train_SVM(train)
 print("SVM Classifier")
 
-_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","euclidean"]]
+_test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3", "reoccur4", "reoccur5", "reoccur6","euclidean","refuting_feature_count","char_length_headline","char_length_body"]]
 
 _predictions = clf.predict(_test)
 
@@ -125,10 +140,10 @@ print (pd.crosstab(test.Stance, test.predicted_SVM,margins=True))
 #viz.summaryStatistics(test)
 
 # Bar Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
-viz.countPlot(test)
+#viz.countPlot(test)
 
 # Compare Countplots of Random Forest, XGBoost, SVM on test set
-viz.compare_countPlots(test)
+#viz.compare_countPlots(test)
 
 # Swarm Plot for comparing counts of  Actual Stances vs Predicted Stances in Test Data on Random Forest model
 #viz.swarmPlot(test)

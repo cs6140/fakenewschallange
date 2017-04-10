@@ -24,14 +24,15 @@ def plot_CLS(dataFrame):
     plt.show()
 
 def dataFrame_CSV(dataFrame):
-    dataFrame.to_excel('test.xlsx', sheet_name='Sheet1')
+    dataFrame.to_excel('test3.xlsx', sheet_name='Sheet1')
     print("Excel file generated")
 
 def summaryStatistics(dataFrame):
     print(dataFrame.columns)
     print(dataFrame)
-    #print(data.describe())
+    print(dataFrame.describe())
     print(dataFrame.groupby(['Stance']).mean())
+    print(dataFrame.groupby(['Stance']).count())
 
 def countPlot(dataFrame):
     fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
@@ -94,12 +95,39 @@ def feature_bodyLength(dataFrame):
     sns.lmplot('char_length_body','reoccur6', data = dataFrame, hue='Stance',fit_reg=False)
     plt.show()
 
-def pointPlot(dataFrame):
+def boxplot_overlapping(dataFrame):
+
+    fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
+    c1 = sns.boxplot(x="Stance",y="overlapping", data=dataFrame,hue="Stance",ax=ax1,order=['unrelated','discuss','agree','disagree'],)
+    c1.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Overlapping Ratio',ylim=(0,0.15))
+    c2 = sns.violinplot(x="Stance",y="overlapping", data=dataFrame,hue="Stance",ax = ax2,order=['unrelated','discuss','agree','disagree'])
+    c2.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Overlapping Ratio,',ylim=(0.0,0.15))
+    plt.show()
+
+
+def boxplot_ngrams(dataFrame):
+
+
+    # Plot unigrams and bi-grams with respect to Stances
+    fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
+    c1 = sns.boxplot(x="Stance",y="reoccur1", data=dataFrame,hue="Stance",ax=ax1,order=['unrelated','discuss','agree','disagree'],)
+    c1.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Count of Unigrams')
+    c2 = sns.boxplot(x="Stance",y="reoccur2", data=dataFrame,hue="Stance",ax = ax2,order=['unrelated','discuss','agree','disagree'])
+    c2.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Count of Bigrams,')
+    plt.show()
+
+    plt.show(sns.boxplot(x="Stance", y="reoccur3", hue="Stance", data=dataFrame))
+    plt.show(sns.boxplot(x="Stance", y="reoccur4", hue="Stance", data=dataFrame))
+    plt.show(sns.boxplot(x="Stance", y="reoccur5", hue="Stance", data=dataFrame))
+    plt.show(sns.boxplot(x="Stance", y="reoccur6", hue="Stance", data=dataFrame))
+
+def misc():
+
     # plt.show(sns.boxplot(x="Stance", y="cosine", hue="Stance", data=dataFrame))
     # plt.show(sns.boxplot(x="Stance", y="euclidean", hue="Stance", data=dataFrame))
     # plt.show(sns.violinplot(x="Stance", y="cosine", hue="Stance", data=dataFrame))
     # plt.show(sns.violinplot(x="Stance", y="euclidean", hue="Stance", data=dataFrame))
-    plt.show(sns.boxplot(x="Stance", y="overlapping", hue="Stance", data=dataFrame))
+    # plt.show(sns.boxplot(x="Stance", y="overlapping", hue="Stance", data=dataFrame))
     # plt.show(sns.violinplot(x="Stance", y="overlapping", hue="Stance", data=dataFrame))
 
     fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
@@ -116,13 +144,31 @@ def pointPlot(dataFrame):
     c2.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Euclidean Distance')
     plt.show()
 
-    fig,(ax1, ax2) = plt.subplots(ncols=2, sharey=False)
-    c1 = sns.boxplot(x="Stance",y="overlapping", data=dataFrame,hue="Stance",ax=ax1,order=['unrelated','discuss','agree','disagree'],)
-    c1.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Overlapping Ratio',ylim=(0,0.15))
-    c2 = sns.violinplot(x="Stance",y="overlapping", data=dataFrame,hue="Stance",ax = ax2,order=['unrelated','discuss','agree','disagree'])
-    c2.set(xlabel='Categorical Stances in the Training Set', ylabel = 'Overlapping Ratio,',ylim=(0.0,0.15))
-    plt.show()
-    #c1.set(ylim=(0.0,0.4),)
+
+    plt.show(sns.boxplot(x="Stance", y="char_length_body", hue="Stance", data=dataFrame))
+    plt.show(sns.boxplot(x="Stance", y="char_length_headline", hue="Stance", data=dataFrame))
+
+    plt.show(sns.boxplot(x="Stance", y="refuting_feature_count", hue="Stance", data=dataFrame))
+    plt.show(sns.violinplot(x="Stance", y="refuting_feature_count", hue="Stance", data=dataFrame))
+
+
+
+
+    # fig,(ax1,ax2,ax3,ax4,ax5,ax6) = plt.subplots(ncols=6,nrows=2, sharey=False)
+    # c1 = sns.boxplot(x="Stance",y="reoccur1", data=dataFrame,hue="Stance",ax=ax1,order=['unrelated','discuss','agree','disagree'],)
+    # c1.set(xlabel='Categorical Stances in the Training Set', ylabel = 'unigram')
+    # c2 = sns.boxplot(x="Stance",y="reoccur2", data=dataFrame,hue="Stance",ax = ax2,order=['unrelated','discuss','agree','disagree'])
+    # c2.set(xlabel='Categorical Stances in the Training Set', ylabel = 'bigram')
+    # c3 = sns.boxplot(x="Stance",y="reoccur3", data=dataFrame,hue="Stance",ax = ax3,order=['unrelated','discuss','agree','disagree'])
+    # c3.set(xlabel='Categorical Stances in the Training Set', ylabel = 'trigram')
+    # c4 = sns.boxplot(x="Stance",y="reoccur4", data=dataFrame,hue="Stance",ax = ax4,order=['unrelated','discuss','agree','disagree'])
+    # c4.set(xlabel='Categorical Stances in the Training Set', ylabel = '4 gram')
+    # c5 = sns.boxplot(x="Stance",y="reoccur5", data=dataFrame,hue="Stance",ax = ax5,order=['unrelated','discuss','agree','disagree'])
+    # c5.set(xlabel='Categorical Stances in the Training Set', ylabel = '5 gram')
+    # c6 = sns.boxplot(x="Stance",y="reoccur6", data=dataFrame,hue="Stance",ax = ax6,order=['unrelated','discuss','agree','disagree'])
+    # c6.set(xlabel='Categorical Stances in the Training Set', ylabel = '6 gram')
+    # plt.show()
+
 
 
 
