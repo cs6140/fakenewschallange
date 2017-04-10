@@ -44,7 +44,7 @@ def train_XGB(data, test):
 
 
 
-    gbm = xgb.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05).fit(data[predictors], response)
+    gbm = xgb.XGBClassifier(max_depth=5, n_estimators=300, learning_rate=0.1,objective='multi:softmax').fit(data[predictors], response)
 
     _test = test[["overlapping", "reoccur1", "reoccur2", "reoccur3","reoccur4", "reoccur5", "reoccur6","euclidean","refuting_feature_count","char_length_headline","char_length_body"]]#,"cosine"#,"wmdistance", "euclidean"]]
     _predictions = gbm.predict(_test)
