@@ -147,7 +147,54 @@ def canberra(u, v):
         print("Error...Returning 0.0")
     return dist
 
-def difference1(u,v):
-    diff = np.subtract(np.array(u),np.array(v))
-    diff = diff.tolist()
-    return diff
+
+def refuting_features(headline, body):
+    _refuting_words = [
+        'fake',
+        'fraud',
+        'hoax',
+        'false',
+        'deny', 'denies',
+        # 'refute',
+        'not',
+        'despite',
+        'nope',
+        'doubt', 'doubts',
+        'bogus',
+        'debunk',
+        'pranks',
+        'retract'
+    ]
+
+    X = []
+    features = [1 if word in headline else 0 for word in _refuting_words]
+    X.append(features)
+    return X
+    # for i, (headline, body):
+    #
+    #     features = [1 if word in headline else 0 for word in _refuting_words]
+    #     X.append(features)
+
+    
+def refuting_features_count(headline, body):
+    _refuting_words = [
+        'fake','doctored'
+        'fraud',
+        'hoax',
+        'false',
+        'deny', 'denies',
+        'not',
+        'despite',
+        'nope',
+        'doubt', 'doubts',
+        'bogus',
+        'debunk','debunked'
+        'pranks',
+        'retract',
+        'wrong','wrongly'
+    ]
+    count=0
+    for token in headline:
+        if token in _refuting_words:
+            count += 100
+    return count
