@@ -5,7 +5,7 @@ import numpy as np
 
 
 
-model = KeyedVectors.load_word2vec_format('C:/Users/AKHIL NAIR/Documents/Project CS6140/GoogleNews-vectors-negative300.bin.gz', binary=True)
+model = KeyedVectors.load_word2vec_format('C:/Users/wsl/code/fakenewschallange/GoogleNews-vectors-negative300.bin.gz', binary=True)
 
 
 def tovector(words):

@@ -1,11 +1,13 @@
+import encoding
 import scipy as sp
 from collections import Counter
-<<<<<<< HEAD
-import sklearn.feature_extraction.text
-=======
-import encoding
-
->>>>>>> 7fafaaef1c972a0de2ee95d6e1a281f22e6f7331
+import numpy as np
+# <<<<<<< HEAD
+# import sklearn.feature_extraction.text
+# =======
+# import encoding
+#
+# >>>>>>> 7fafaaef1c972a0de2ee95d6e1a281f22e6f7331
 
 model = encoding.get_vectorizer_model()
 
@@ -144,3 +146,8 @@ def canberra(u, v):
     except:
         print("Error...Returning 0.0")
     return dist
+
+def difference1(u,v):
+    diff = np.subtract(np.array(u),np.array(v))
+    diff = diff.tolist()
+    return diff
