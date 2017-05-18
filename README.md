@@ -7,12 +7,21 @@ Script Dependencies
 
 Python modules
 
+Feature Generation
+   	   
 1) nltk
 2) nltk-stopwords
 3) nltk-wordnet
-4) pandas
-5) xgboost
-6) seaborn
+4) Gensim (word2Vec)	
 
-R Modules
 
+Exploratory Data Analysis and Visualization
+    	    	 	
+5) pandas
+6) seaborn 
+
+   	  
+Algorithms
+
+7) Scikit Learn
+8) XGBoost   	  
