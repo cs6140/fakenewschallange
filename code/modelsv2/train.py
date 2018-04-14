@@ -144,9 +144,42 @@ batch_size = 500
 seq_len_article = 400
 seq_len_headline = 20
 num_dimensions = 300
+input_size = len(data)
+
+from random import randint
+
+def get_train_batch():
+
+    start_index = randint(0, input_size - batch_size)
+    end_index = start_index + batch_size
+    print("Next batch to train starting index: ", start_index)
+
+
+    batch_headline = (_data['encoded_headline'][start_index: end_index]).tolist()
+    batch_article = (_data['encoded_article'][start_index: end_index]).tolist()
+    labels = _data['label'][start_index: end_index].tolist()
+
+    headlines = np.zeros([batch_size, seq_len_headline])
+    for i in range(batch_size):
+        headlines[i] = batch_headline[i]
+
+    articles = np.zeros([batch_size, seq_len_article])
+    for i in range(batch_size):
+        articles[i] = batch_article[i]
+        
+    return headlines, articles, np.array(labels)
+    
+
+
+headlines, articles, labels = get_train_batch()
+
 
 import tensorflow as tf
 tf.reset_default_graph()
+
+sess = tf.InteractiveSession()
+sess.run(tf.global_variables_initializer())
+
 
 labels = tf.placeholder(tf.float32, [batch_size, num_classes])
 
@@ -154,10 +187,25 @@ article_input = tf.placeholder(tf.int32, [batch_size, seq_len_article])
 article_data = tf.Variable(tf.zeros([batch_size, seq_len_article, num_dimensions]),dtype=tf.float32)
 article_data = tf.nn.embedding_lookup(wordvectors, article_input)
 
-
 headline_input = tf.placeholder(tf.int32, [batch_size, seq_len_headline])
 headline_data = tf.Variable(tf.zeros([batch_size, seq_len_headline, num_dimensions]),dtype=tf.float32)
 headline_data = tf.nn.embedding_lookup(wordvectors, headline_input)
 
 
 merged_data = tf.concat([headline_data, article_data], axis=1)
+
+iterations = 10000
+
+for i in range(iterations):
+   headlines, articles, labels = get_train_batch();
+
+   sess.run(merged_data, {article_input: articles, headline_input: headlines, labels:labels})
+   print("Epoch :", i+1)
+
+   import ipdb
+   ipdb.set_trace()
+   
+   # Write summary to Tensorboard
+   if (i % 500 == 0):
+       summary = sess.run(merged, {input_data: nextBatch, labels: nextBatchLabels})
+
