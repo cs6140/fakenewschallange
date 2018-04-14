@@ -130,12 +130,12 @@ data["label"] = data["Stance"].apply(lambda x: [1, 0, 0, 0] if x == 'agree' else
 
 import pickle
 
-with open("data.bin","wb") as f:
-    pickle.dump(data, f)
+# with open("data.bin","wb") as f:
+#     pickle.dump(data, f)
 
 #load vectorized data    
-# with open("data.bin","rb") as f:
-#     _data = pickle.load(f)
+with open("data.bin","rb") as f:
+    data = pickle.load(f)
 
 train, test = train_test_split(data, test_size=0.2, random_state=55)
 
@@ -155,9 +155,9 @@ def get_train_batch():
     print("Next batch to train starting index: ", start_index)
 
 
-    batch_headline = (_data['encoded_headline'][start_index: end_index]).tolist()
-    batch_article = (_data['encoded_article'][start_index: end_index]).tolist()
-    labels = _data['label'][start_index: end_index].tolist()
+    batch_headline = (train['encoded_headline'][start_index: end_index]).tolist()
+    batch_article = (train['encoded_article'][start_index: end_index]).tolist()
+    labels = train['label'][start_index: end_index].tolist()
 
     headlines = np.zeros([batch_size, seq_len_headline])
     for i in range(batch_size):
@@ -167,7 +167,7 @@ def get_train_batch():
     for i in range(batch_size):
         articles[i] = batch_article[i]
         
-    return headlines, articles, np.array(labels)
+    return headlines, articles, labels
     
 
 
@@ -180,6 +180,7 @@ tf.reset_default_graph()
 sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 
+lstmunits = 128
 
 labels = tf.placeholder(tf.float32, [batch_size, num_classes])
 
@@ -194,12 +195,31 @@ headline_data = tf.nn.embedding_lookup(wordvectors, headline_input)
 
 merged_data = tf.concat([headline_data, article_data], axis=1)
 
+lstm_cell = tf.contrib.rnn.BasicLSTMCell(lstmunits)
+lstm_cell = tf.contrib.rnn.DropoutWrapper(cell=lstm_cell, output_keep_prob=0.75)
+value, _ = tf.nn.dynamic_rnn(lstm_cell, merged_data, dtype=tf.float32)
+
+weight = tf.Variable(tf.truncated_normal([lstmunits, num_classes]), dtype=tf.float32)
+bias = tf.Variable(tf.constant(0.1, shape=[num_classes]))
+value = tf.transpose(value, [1, 0, 2])
+last = tf.gather(value, int(value.get_shape()[0]) - 1)
+prediction = (tf.matmul(last, weight) + bias)
+
+
+correctPred = tf.equal(tf.argmax(prediction,1), tf.argmax(labels,1))
+accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
+
+
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
+optimizer = tf.train.AdamOptimizer().minimize(loss)
+
+
 iterations = 10000
 
 for i in range(iterations):
    headlines, articles, labels = get_train_batch();
 
-   sess.run(merged_data, {article_input: articles, headline_input: headlines, labels:labels})
+   sess.run(merged_data, {article_input: articles, headline_input: headlines, labels: labels})
    print("Epoch :", i+1)
 
    import ipdb
