@@ -33,7 +33,7 @@ def preprocess(x):
     x = x.replace("”","")
     x = x.replace("‘","")
     x = x.replace("’","")
-    return x.lower().translate(translator)
+    return x.lower().translate(translator).split()
 
 data["content_tokens"] = data["articleBody"].progress_apply(lambda x: preprocess(x))
 data["headline_tokens"] = data["Headline"].progress_apply(lambda x: preprocess(x))
@@ -62,7 +62,7 @@ vocabulary_headlines = [item for sublist in sentences_headlines for item in subl
 
 vocabulary = list(set(vocabulary_headlines + vocabulary_articlebody))
 
-train, test = train_test_split(data, test_size=0.2, random_state=55)
+
 
 
 
@@ -100,7 +100,7 @@ wordvectors, invalid_words = get_word_vectors(vocabulary)
 
 
 
-def get_vectors_of_document(sentence, sequence_len = 400):
+def get_vectors_of_document(words, sequence_len = 400):
     def get_index(word):
         if word in invalid_words:
             return len(vocabulary)
@@ -109,7 +109,6 @@ def get_vectors_of_document(sentence, sequence_len = 400):
         except:
             return len(vocabulary)
     
-    words = sentence.split()
     doc_vec = np.zeros(sequence_len)
     sequence =  [get_index(word) for word in words][:sequence_len]
     if(len(sequence) < sequence_len):
@@ -120,6 +119,45 @@ def get_vectors_of_document(sentence, sequence_len = 400):
 
 
 
+
 data["encoded_article"] = data["content_tokens"].progress_apply(lambda x : get_vectors_of_document(x))
 data["encoded_headline"] = data["headline_tokens"].progress_apply(lambda x : get_vectors_of_document(x, 20))
 
+
+print("Setting the labels...")
+data["label"] = data["Stance"].apply(lambda x: [1, 0, 0, 0] if x == 'agree' else ([0, 1, 0, 0] if x == 'discuss' else ([0, 0, 1, 0] if x == 'disagree' else [0, 0, 0, 1])))
+
+
+import pickle
+
+with open("data.bin","wb") as f:
+    pickle.dump(data, f)
+
+#load vectorized data    
+# with open("data.bin","rb") as f:
+#     _data = pickle.load(f)
+
+train, test = train_test_split(data, test_size=0.2, random_state=55)
+
+num_classes = 4
+batch_size = 500
+seq_len_article = 400
+seq_len_headline = 20
+num_dimensions = 300
+
+import tensorflow as tf
+tf.reset_default_graph()
+
+labels = tf.placeholder(tf.float32, [batch_size, num_classes])
+
+article_input = tf.placeholder(tf.int32, [batch_size, seq_len_article])
+article_data = tf.Variable(tf.zeros([batch_size, seq_len_article, num_dimensions]),dtype=tf.float32)
+article_data = tf.nn.embedding_lookup(wordvectors, article_input)
+
+
+headline_input = tf.placeholder(tf.int32, [batch_size, seq_len_headline])
+headline_data = tf.Variable(tf.zeros([batch_size, seq_len_headline, num_dimensions]),dtype=tf.float32)
+headline_data = tf.nn.embedding_lookup(wordvectors, headline_input)
+
+
+merged_data = tf.concat([headline_data, article_data], axis=1)
