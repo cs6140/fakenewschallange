@@ -1,5 +1,6 @@
 # fakenewschallange
 
+Analysis of the performance of ML  algorithms on the classification of Fake News into 4 discrete levels
 
 ## Script Dependencies - Python modules
 
