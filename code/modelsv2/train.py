@@ -227,14 +227,14 @@ prediction = (tf.matmul(last, weight) + bias)
 correctPred = tf.equal(tf.argmax(prediction,1), tf.argmax(labels,1))
 accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 
-_accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
+accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
 optimizer = tf.train.AdamOptimizer().minimize(loss)
 
 tf.summary.scalar('Loss', loss)
-tf.summary.scalar('Train Accuracy', accuracy)
-tf.summary.scalar('Test Accuracy', _accuracy)
+#tf.summary.scalar('Train Accuracy', accuracy)
+tf.summary.scalar('Test Accuracy', accuracy)
 merged = tf.summary.merge_all()
 logdir = "tensorboard/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "/"
 
@@ -258,7 +258,7 @@ for i in range(iterations):
    if (i % 50 == 0):
 
        headlines, articles, _labels = get_test_batch();
-       sess.run(_accuracy, {article_input: articles, headline_input: headlines, labels: _labels})
+       sess.run(accuracy, {article_input: articles, headline_input: headlines, labels: _labels})
 
        summary = sess.run(merged, {article_input: articles, headline_input: headlines, labels: _labels})
        

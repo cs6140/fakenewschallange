@@ -1,13 +1,11 @@
 # fakenewschallange
 
 
-Script Dependencies
-------------------
+## Script Dependencies
 
+## Python modules
 
-Python modules
-
-Feature Generation
+* Feature Generation
    	   
 1) nltk
 2) nltk-stopwords
@@ -15,13 +13,13 @@ Feature Generation
 4) Gensim (word2Vec)	
 
 
-Exploratory Data Analysis and Visualization
+* Exploratory Data Analysis and Visualization
     	    	 	
 5) pandas
 6) seaborn 
 
    	  
-Algorithms
+* Algorithms
 
 7) Scikit Learn
 8) XGBoost   	  
