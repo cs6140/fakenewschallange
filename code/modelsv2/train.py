@@ -141,6 +141,7 @@ seq_len_article = 400
 seq_len_headline = 20
 num_dimensions = 300
 input_size = len(train)
+input_size_test = len(test)
 
 from random import randint
 
@@ -154,6 +155,29 @@ def get_train_batch():
     batch_headline = (train['encoded_headline'][start_index: end_index]).tolist()
     batch_article = (train['encoded_article'][start_index: end_index]).tolist()
     labels = train['label'][start_index: end_index].tolist()
+
+    headlines = np.zeros([batch_size, seq_len_headline])
+    for i in range(batch_size):
+        headlines[i] = batch_headline[i]
+
+    articles = np.zeros([batch_size, seq_len_article])
+    for i in range(batch_size):
+        articles[i] = batch_article[i]
+        
+    return headlines, articles, labels
+    
+
+
+def get_test_batch():
+
+    start_index = randint(0, input_size_test - batch_size)
+    end_index = start_index + batch_size
+    print("Next batch to train starting index: ", start_index)
+
+
+    batch_headline = (test['encoded_headline'][start_index: end_index]).tolist()
+    batch_article = (test['encoded_article'][start_index: end_index]).tolist()
+    labels = test['label'][start_index: end_index].tolist()
 
     headlines = np.zeros([batch_size, seq_len_headline])
     for i in range(batch_size):
@@ -203,11 +227,14 @@ prediction = (tf.matmul(last, weight) + bias)
 correctPred = tf.equal(tf.argmax(prediction,1), tf.argmax(labels,1))
 accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 
+_accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
+
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
 optimizer = tf.train.AdamOptimizer().minimize(loss)
 
 tf.summary.scalar('Loss', loss)
-tf.summary.scalar('Accuracy', accuracy)
+tf.summary.scalar('Train Accuracy', accuracy)
+tf.summary.scalar('Test Accuracy', _accuracy)
 merged = tf.summary.merge_all()
 logdir = "tensorboard/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "/"
 
@@ -229,7 +256,12 @@ for i in range(iterations):
    print("Epoch :", i+1)
 
    if (i % 50 == 0):
+
+       headlines, articles, _labels = get_test_batch();
+       sess.run(_accuracy, {article_input: articles, headline_input: headlines, labels: _labels})
+
        summary = sess.run(merged, {article_input: articles, headline_input: headlines, labels: _labels})
+       
        writer.add_summary(summary, i)
 
    #Save the network every 10,000 training iterations
