@@ -1,9 +1,7 @@
 # fakenewschallange
 
 
-## Script Dependencies
-
-## Python modules
+## Script Dependencies - Python modules
 
 * Feature Generation
    	   
@@ -23,3 +21,10 @@
 
 7) Scikit Learn
 8) XGBoost   	  
+
+
+## New experiments 
+
+* [Deep Model - Single layer LSTM](https://github.com/srjit/fakenewschallange/tree/master/code/modelsv2)
+
+	- The model provides about 75% accuracy 
