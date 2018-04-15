@@ -41,14 +41,14 @@ data["headline_tokens"] = data["Headline"].progress_apply(lambda x: preprocess(x
 data["content_len"] = data["content_tokens"].progress_apply(lambda x : len(x))
 data["headline_len"] = data["headline_tokens"].progress_apply(lambda x : len(x))
 
-print("------ Data Statistcs -----")
-l = list(data["content_len"])
-print("Mean lengths of articles", reduce(lambda x, y: x + y, l) / len(l))
-print("Median lengths of articles", np.median(l))
+# print("------ Data Statistcs -----")
+# l = list(data["content_len"])
+# print("Mean lengths of articles", reduce(lambda x, y: x + y, l) / len(l))
+# print("Median lengths of articles", np.median(l))
 
-l = list(data["headline_len"])
-print("Mean lengths of headlines", reduce(lambda x, y: x + y, l) / len(l))
-print("Median lengths of headlines", np.median(l))
+# l = list(data["headline_len"])
+# print("Mean lengths of headlines", reduce(lambda x, y: x + y, l) / len(l))
+# print("Median lengths of headlines", np.median(l))
 
 
 ## Let's keep the article length 400
@@ -98,30 +98,26 @@ def get_word_vectors(_vocabulary):
 wordvectors, invalid_words = get_word_vectors(vocabulary)
 
 
-
-
-def get_vectors_of_document(words, sequence_len = 400):
-    def get_index(word):
-        if word in invalid_words:
-            return len(vocabulary)
-        try:
-            return vocabulary.index(word)
-        except:
-            return len(vocabulary)
+# def get_vectors_of_document(words, sequence_len = 400):
+#     def get_index(word):
+#         if word in invalid_words:
+#             return len(vocabulary)
+#         try:
+#             return vocabulary.index(word)
+#         except:
+#             return len(vocabulary)
     
-    doc_vec = np.zeros(sequence_len)
-    sequence =  [get_index(word) for word in words][:sequence_len]
-    if(len(sequence) < sequence_len):
-        sequence[len(sequence):sequence_len] = [0] * (sequence_len - len(sequence))
+#     doc_vec = np.zeros(sequence_len)
+#     sequence =  [get_index(word) for word in words][:sequence_len]
+#     if(len(sequence) < sequence_len):
+#         sequence[len(sequence):sequence_len] = [0] * (sequence_len - len(sequence))
     
-    return np.asarray(sequence)
+#     return np.asarray(sequence)
 
 
 
-
-
-data["encoded_article"] = data["content_tokens"].progress_apply(lambda x : get_vectors_of_document(x))
-data["encoded_headline"] = data["headline_tokens"].progress_apply(lambda x : get_vectors_of_document(x, 20))
+# data["encoded_article"] = data["content_tokens"].progress_apply(lambda x : get_vectors_of_document(x))
+# data["encoded_headline"] = data["headline_tokens"].progress_apply(lambda x : get_vectors_of_document(x, 20))
 
 
 print("Setting the labels...")
@@ -144,7 +140,7 @@ batch_size = 500
 seq_len_article = 400
 seq_len_headline = 20
 num_dimensions = 300
-input_size = len(data)
+input_size = len(train)
 
 from random import randint
 
@@ -177,8 +173,6 @@ headlines, articles, labels = get_train_batch()
 import tensorflow as tf
 tf.reset_default_graph()
 
-sess = tf.InteractiveSession()
-sess.run(tf.global_variables_initializer())
 
 lstmunits = 128
 
@@ -209,23 +203,40 @@ prediction = (tf.matmul(last, weight) + bias)
 correctPred = tf.equal(tf.argmax(prediction,1), tf.argmax(labels,1))
 accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 
-
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
 optimizer = tf.train.AdamOptimizer().minimize(loss)
+
+tf.summary.scalar('Loss', loss)
+tf.summary.scalar('Accuracy', accuracy)
+merged = tf.summary.merge_all()
+logdir = "tensorboard/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "/"
+
+sess = tf.InteractiveSession()
+writer = tf.summary.FileWriter(logdir, sess.graph)
+saver = tf.train.Saver()
 
 
 iterations = 10000
 
-for i in range(iterations):
-   headlines, articles, labels = get_train_batch();
+sess = tf.InteractiveSession()
+sess.run(tf.global_variables_initializer())
 
-   sess.run(merged_data, {article_input: articles, headline_input: headlines, labels: labels})
+
+for i in range(iterations):
+   headlines, articles, _labels = get_train_batch();
+
+   sess.run(optimizer, {article_input: articles, headline_input: headlines, labels: _labels})
    print("Epoch :", i+1)
 
-   import ipdb
-   ipdb.set_trace()
-   
-   # Write summary to Tensorboard
-   if (i % 500 == 0):
-       summary = sess.run(merged, {input_data: nextBatch, labels: nextBatchLabels})
+   if (i % 50 == 0):
+       summary = sess.run(merged, {article_input: articles, headline_input: headlines, labels: _labels})
+       writer.add_summary(summary, i)
+
+   #Save the network every 10,000 training iterations
+   if (i % 1000 == 0 and i != 0):
+       save_path = saver.save(sess, "models/pretrained_lstm.ckpt", global_step=i)
+       print("saved to %s" % save_path)
+
+       
+writer.close()
 
